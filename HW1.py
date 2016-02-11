@@ -119,7 +119,7 @@ def hwPart1():
         #Find the mean spiking rate. When V is set to 30, that means a spike has occurred.
         meanSpikingRate.append(voltageOutputList.count(30))
         
-    plt.plot(inputArray, meanSpikingRate)
+    plt.scatter(inputArray, meanSpikingRate)
     plt.xlabel('Input Level')
     plt.ylabel('Mean Spiking Rate')
     plt.title('Mean Spiking Rate vs Input Level')
@@ -130,9 +130,21 @@ def hwPart1():
         #Simulate neuron for current input.
         voltageOutputList = runSingleNeuronSpiking(inputValue, tspan, plot=True)
         
+def hwPart2():
+    meanSpikingRate = []
+    inputArray = np.linspace(0, 20, 20/.25, endpoint=True)
+    for inputValue in inputArray:
+        #Simulate neuron for current input.
+        voltageOutputList = runSingleNeuronSpiking(inputValue, tspan, plot=False)
+        #Filter out the beginning time from 0 to 200.(Aka take times 200 to 500.)
+        voltageOutputList = voltageOutputList[800:]        
+        #Find the mean spiking rate. When V is set to 30, that means a spike has occurred.
+        meanSpikingRate.append(voltageOutputList.count(30))
     
+
 if __name__ == "__main__":
-    hwPart1()
+    #hwPart1()
+    #hwPart2()
         
     
     
