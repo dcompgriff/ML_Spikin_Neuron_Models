@@ -53,12 +53,12 @@ tspan = np.linspace(0, steps, num=steps/tau, endpoint=True)
 #T1 is the time interval at which the input first rises.
 T1 = 50
 
-voltageList = []
 uList = []
 
-def runSingleNeuronSpiking(inputIValue, tspan, T1=50, plot=False):
+def runSingleNeuronSpiking(inputIValue, tspan, steps=500, T1=50, plot=False):
     neuron1 = SpikingNeuron()
     inputI = 0
+    voltageList = []
     for time in tspan:
         if time < T1:
             inputI = 0
@@ -71,10 +71,12 @@ def runSingleNeuronSpiking(inputIValue, tspan, T1=50, plot=False):
     if plot:    
         plt.plot(tspan, voltageList)
         plt.axis([0, steps, -90, 40])
-        plt.title('Tonic Spiking.')
+        plt.xlabel('Time')
+        plt.ylabel('Voltage mV')
+        plt.title('Tonic Spiking At Input: ' + str(inputIValue))
         plt.show()
         
-    return np.asarray(voltageList)
+    return voltageList
     
     
 
@@ -106,10 +108,32 @@ class SpikingNeuron:
         
         return vOut
         
+def hwPart1():
+    meanSpikingRate = []
+    inputArray = np.linspace(0, 20, 20/.25, endpoint=True)
+    for inputValue in inputArray:
+        #Simulate neuron for current input.
+        voltageOutputList = runSingleNeuronSpiking(inputValue, tspan, plot=False)
+        #Filter out the beginning time from 0 to 200.(Aka take times 200 to 500.)
+        voltageOutputList = voltageOutputList[800:]        
+        #Find the mean spiking rate. When V is set to 30, that means a spike has occurred.
+        meanSpikingRate.append(voltageOutputList.count(30))
+        
+    plt.plot(inputArray, meanSpikingRate)
+    plt.xlabel('Input Level')
+    plt.ylabel('Mean Spiking Rate')
+    plt.title('Mean Spiking Rate vs Input Level')
+    plt.show()
+        
+    inputArray = [1, 5, 10, 15, 20]
+    for inputValue in inputArray:
+        #Simulate neuron for current input.
+        voltageOutputList = runSingleNeuronSpiking(inputValue, tspan, plot=True)
         
     
 if __name__ == "__main__":
-    runSingleNeuronSpiking(1, tspan)
+    hwPart1()
+        
     
     
     
