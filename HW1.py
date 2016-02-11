@@ -56,22 +56,26 @@ T1 = 50
 voltageList = []
 uList = []
 
-def runSingleNeuronSpiking():
+def runSingleNeuronSpiking(inputIValue, tspan, T1=50, plot=False):
     neuron1 = SpikingNeuron()
     inputI = 0
     for time in tspan:
         if time < T1:
             inputI = 0
         else:
-            inputI = 1.0
+            inputI = inputIValue
         #Stimulate the neuron.
         voltageList.append(neuron1.stimulate(inputI))
     
     #When finished, plot the function output for the time span.
-    plt.plot(tspan, voltageList)
-    plt.axis([0, steps, -90, 40])
-    plt.title('Tonic Spiking.')
-    plt.show()
+    if plot:    
+        plt.plot(tspan, voltageList)
+        plt.axis([0, steps, -90, 40])
+        plt.title('Tonic Spiking.')
+        plt.show()
+        
+    return np.asarray(voltageList)
+    
     
 
 class SpikingNeuron:
@@ -105,7 +109,7 @@ class SpikingNeuron:
         
     
 if __name__ == "__main__":
-    runSingleNeuronSpiking()
+    runSingleNeuronSpiking(1, tspan)
     
     
     
