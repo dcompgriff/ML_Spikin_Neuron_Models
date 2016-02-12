@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Feb 11 16:04:25 2016
+Acknowledgement: The neuron spiking model code was written with 
+reference to the Izhikevich neuron spiking model code. 
 
-@author: DAN
+@author: Daniel Griffin
 """
 
 import numpy as np
@@ -13,6 +15,9 @@ steps = 500
 tspan = np.linspace(0, steps, num=steps/tau, endpoint=True)
 #T1 is the time interval at which the input first rises.
 T1 = 50
+
+ulist = []
+vlist = []
 
 def runSingleNeuronSpiking(inputIValue, tspan, steps=500, T1=50, plot=False):
     neuron1 = SpikingNeuron()
@@ -38,6 +43,7 @@ def runSingleNeuronSpiking(inputIValue, tspan, steps=500, T1=50, plot=False):
     return voltageList
     
 def runSequentialNeuronSpikingModel(inputIValue, tspan, steps=500, T1=50, plot=False):
+    global ulist, vlist
     neuron1 = SpikingNeuron()
     neuron2 = SpikingNeuron()
     input1I = 0
@@ -58,14 +64,25 @@ def runSequentialNeuronSpikingModel(inputIValue, tspan, steps=500, T1=50, plot=F
             voltageN2List.append(neuron2.stimulate(weight*1))
         else:
             voltageN2List.append(neuron2.stimulate(0))
+    ulist = neuron2.uList
+    vlist = neuron2.vList
+    
             
     #When finished, plot the function output for the time span.
-    if plot:    
+    if plot:  
+        plt.subplot(121)
+        plt.plot(tspan, voltageN1List)
+        plt.axis([0, steps, -90, 40])
+        plt.xlabel('Time')
+        plt.ylabel('Voltage mV')
+        plt.title('Tonic Spiking At Input: ' + str(inputIValue))
+        plt.subplot(122)
         plt.plot(tspan, voltageN2List)
         plt.axis([0, steps, -90, 40])
         plt.xlabel('Time')
         plt.ylabel('Voltage mV')
         plt.title('Tonic Spiking At Input: ' + str(inputIValue))
+        plt.tight_layout()        
         plt.show()
     
     return voltageN1List, voltageN2List
@@ -80,15 +97,19 @@ class SpikingNeuron:
         self.V = -64
         self.tau = 0.25
         self.u = self.b * self.V
+        self.uList = []
+        self.vList = []
     
     def stimulate(self, inputI):
         #Do an incremental membrane potential update using the differential equation times the discretization.
         #Vn+1 = Vn + deltaVn
         #deltaVn = delta_t * (dV/dt)
         self.V = self.V + self.tau*( (0.04*(self.V**2)) + (5*self.V) + 140 - self.u + inputI )  
-        vOut = self.V        
+        vOut = self.V  
+        self.vList.append(vOut)
         #Do an increment for the 'u' differential equation.
         self.u = self.u + self.tau*(self.a*((self.b*self.V) - self.u))
+        self.uList.append(self.u)
         
         #Set up a peak saturation and breakdown condition.
         if(self.V >= 30 ):
@@ -155,8 +176,9 @@ def hwPart2():
     
 
 if __name__ == "__main__":
-    hwPart1()
-    hwPart2()
+    #hwPart1()
+    #hwPart2()
+    voltageN1List, voltageN2List = runSequentialNeuronSpikingModel(15, tspan, plot=True)
         
     
     
