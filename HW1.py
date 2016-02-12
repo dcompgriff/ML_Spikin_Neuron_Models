@@ -8,52 +8,11 @@ Created on Thu Feb 11 16:04:25 2016
 import numpy as np
 import matplotlib.pyplot as plt
 
-#%   self MATLAB file generates figure 1 in the paper by 
-#%               Izhikevich E.M. (2004) 
-#%   Which Model to Use For Cortical Spiking Neurons? 
-#%   use MATLAB R13 or later. November 2003. San Diego, CA 
-#
-#
-#%%%%%%%%%%%%%%% regular spiking %%%%%%%%%%%%%%%%%%%%%% 
-#
-#steps = 500;                  %This simulation runs for 500 steps
-#
-#a=0.02; b=0.25; c=-65;  d=6;
-#V=-64; u=b*V;
-#VV=[];  uu=[];
-#tau = 0.25; tspan = 0:tau:steps;  %tau is the discretization time-step
-#                                  %tspan is the simulation interval
-#                                
-#T1=50;            %T1 is the time at which the step input rises
-#for t=tspan
-#    if (t>T1) 
-#        I=1.0;     % This is the input which you will change in your simulation
-#    else
-#        I=0;
-#    end;
-#    V = V + tau*(0.04*V^2+5*V+140-u+I);
-#    u = u + tau*a*(b*V-u);
-#    if V > 30
-#        VV(end+1)=30;         %VV is the time-series of membrane potentials
-#        V = c;
-#        u = u + d;
-#    else
-#        VV(end+1)=V;
-#    end;
-#    uu(end+1)=u;
-#end;
-#plot(tspan,VV);                   %VV is plotted as the output
-#axis([0 max(tspan) -90 40])
-#title('Tonic Spiking');
-
-
 tau = .25
 steps = 500
 tspan = np.linspace(0, steps, num=steps/tau, endpoint=True)
 #T1 is the time interval at which the input first rises.
 T1 = 50
-
-uList = []
 
 def runSingleNeuronSpiking(inputIValue, tspan, steps=500, T1=50, plot=False):
     neuron1 = SpikingNeuron()
@@ -196,9 +155,8 @@ def hwPart2():
     
 
 if __name__ == "__main__":
-    #hwPart1()
+    hwPart1()
     hwPart2()
-    #runSequentialNeuronSpikingModel(100, tspan, plot=True)
         
     
     
