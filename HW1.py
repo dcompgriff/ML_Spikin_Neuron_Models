@@ -78,7 +78,38 @@ def runSingleNeuronSpiking(inputIValue, tspan, steps=500, T1=50, plot=False):
         
     return voltageList
     
+def runSequentialNeuronSpikingModel(inputIValue, tspan, steps=500, T1=50, plot=False):
+    neuron1 = SpikingNeuron()
+    neuron2 = SpikingNeuron()
+    input1I = 0
+    weight = 100
+    voltageN1List = []
+    voltageN2List = []
+    for time in tspan:
+        if time < T1:
+            input1I = 0
+        else:
+            input1I = inputIValue
+            
+        #Stimulate neuron 1.
+        neuron1Output = neuron1.stimulate(input1I)
+        voltageN1List.append(neuron1Output)
+        #Stimulate neuron 2.
+        if neuron1Output == 30:
+            voltageN2List.append(neuron2.stimulate(weight*1))
+        else:
+            voltageN2List.append(neuron2.stimulate(0))
+            
+    #When finished, plot the function output for the time span.
+    if plot:    
+        plt.plot(tspan, voltageN2List)
+        plt.axis([0, steps, -90, 40])
+        plt.xlabel('Time')
+        plt.ylabel('Voltage mV')
+        plt.title('Tonic Spiking At Input: ' + str(inputIValue))
+        plt.show()
     
+    return voltageN1List, voltageN2List
 
 class SpikingNeuron:
     
@@ -117,7 +148,7 @@ def hwPart1():
         #Filter out the beginning time from 0 to 200.(Aka take times 200 to 500.)
         voltageOutputList = voltageOutputList[800:]        
         #Find the mean spiking rate. When V is set to 30, that means a spike has occurred.
-        meanSpikingRate.append(voltageOutputList.count(30))
+        meanSpikingRate.append(voltageOutputList.count(30)/300)
         
     plt.scatter(inputArray, meanSpikingRate)
     plt.xlabel('Input Level')
@@ -131,20 +162,43 @@ def hwPart1():
         voltageOutputList = runSingleNeuronSpiking(inputValue, tspan, plot=True)
         
 def hwPart2():
-    meanSpikingRate = []
+    meanSpikingRateN1 = []
+    meanSpikingRateN2 = []
     inputArray = np.linspace(0, 20, 20/.25, endpoint=True)
+    #inputArray = [0, 1, 5, 10, 15, 20]
     for inputValue in inputArray:
         #Simulate neuron for current input.
-        voltageOutputList = runSingleNeuronSpiking(inputValue, tspan, plot=False)
+        voltageN1List, voltageN2List = runSequentialNeuronSpikingModel(inputValue, tspan, plot=False)
         #Filter out the beginning time from 0 to 200.(Aka take times 200 to 500.)
-        voltageOutputList = voltageOutputList[800:]        
+        voltageN1List = voltageN1List[800:]  
+        voltageN2List = voltageN2List[800:] 
         #Find the mean spiking rate. When V is set to 30, that means a spike has occurred.
-        meanSpikingRate.append(voltageOutputList.count(30))
+        meanSpikingRateN1.append(voltageN1List.count(30)/300)
+        meanSpikingRateN2.append(voltageN2List.count(30)/300)
+        
+    plt.scatter(inputArray, meanSpikingRateN1)
+    plt.xlabel('Input Level')
+    plt.ylabel('Mean Spiking Rate')
+    plt.title('Mean Spiking Rate Na vs IA')
+    plt.show()
+    plt.clf()
+    plt.scatter(inputArray, meanSpikingRateN2)
+    plt.xlabel('Input Level')
+    plt.ylabel('Mean Spiking Rate')
+    plt.title('Mean Spiking Rate Nb vs IA')
+    plt.show()
+    plt.clf()
+    plt.scatter(meanSpikingRateN2, meanSpikingRateN1)
+    plt.xlabel('Mean Spiking Rate Nb')
+    plt.ylabel('Mean Spiking Rate Na')
+    plt.title('Mean Spiking Rate Na vs Mean Spiking Rate Nb')
+    plt.show()
     
 
 if __name__ == "__main__":
     #hwPart1()
-    #hwPart2()
+    hwPart2()
+    #runSequentialNeuronSpikingModel(100, tspan, plot=True)
         
     
     
